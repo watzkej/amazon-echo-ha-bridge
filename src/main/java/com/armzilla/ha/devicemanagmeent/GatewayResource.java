@@ -75,5 +75,24 @@ public class GatewayResource {
         return new ResponseEntity<>(null, null, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
+    @RequestMapping(value = "/{gatewayId}/devices", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<List<HADevice>> gatewayDeviceList(@PathVariable("gatewayId") String id){
+        HAGatewayDao descriptor = gatewayRepository.findOne(id);
+        if(descriptor == null){
+            return new ResponseEntity<>(null, null, HttpStatus.NOT_FOUND);
+        }
+
+        VeraGatewayImpl gatewayImpl = new VeraGatewayImpl(descriptor.getAddress());
+        try {
+            List<HADevice> deviceList = gatewayImpl.getAllDevices();
+            return new ResponseEntity<>(deviceList, null, HttpStatus.OK);
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<>(null, null, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
 
 }
